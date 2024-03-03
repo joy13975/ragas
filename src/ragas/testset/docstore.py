@@ -112,7 +112,7 @@ class DocumentStore(ABC):
         ...
 
     @abstractmethod
-    def get_random_nodes(self, k=1) -> t.List[Node]:
+    def get_random_nodes(self, k: int=1, alpha: float=0.1) -> t.List[Node]:
         ...
 
     @abstractmethod

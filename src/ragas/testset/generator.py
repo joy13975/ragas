@@ -187,7 +187,8 @@ class TestsetGenerator:
         with_debugging_logs=False,
         is_async: bool = True,
         raise_exceptions: bool = True,
-        run_config: t.Optional[RunConfig] = None
+        run_config: t.Optional[RunConfig] = None,
+        random_node_alpha: float = 0.1,
     ):
         # chunk documents and add to docstore
         self.docstore.add_documents(
@@ -199,8 +200,9 @@ class TestsetGenerator:
             distributions=distributions,
             with_debugging_logs=with_debugging_logs,
             is_async=is_async,
-            run_config=run_config,
             raise_exceptions=raise_exceptions,
+            run_config=run_config,
+            random_node_alpha=random_node_alpha,
         )
 
     # if you add any arguments to this function, make sure to add them to
@@ -213,7 +215,8 @@ class TestsetGenerator:
         with_debugging_logs=False,
         is_async: bool = True,
         raise_exceptions: bool = True,
-        run_config: t.Optional[RunConfig] = None
+        run_config: t.Optional[RunConfig] = None,
+        random_node_alpha: float=0.1,
     ):
         # chunk documents and add to docstore
         self.docstore.add_documents(
@@ -227,6 +230,7 @@ class TestsetGenerator:
             is_async=is_async,
             raise_exceptions=raise_exceptions,
             run_config=run_config,
+            random_node_alpha=random_node_alpha,
         )
 
     def init_evolution(self, evolution: Evolution) -> None:
@@ -251,7 +255,8 @@ class TestsetGenerator:
         with_debugging_logs=False,
         is_async: bool = True,
         raise_exceptions: bool = True,
-        run_config: t.Optional[RunConfig] = None
+        run_config: t.Optional[RunConfig] = None,
+        random_node_alpha: float = 0.1,
     ):
         # validate distributions
         if not check_if_sum_is_close(list(distributions.values()), 1.0, 3):
@@ -287,7 +292,7 @@ class TestsetGenerator:
 
         current_nodes = [
             CurrentNodes(root_node=n, nodes=[n])
-            for n in self.docstore.get_random_nodes(k=test_size)
+            for n in self.docstore.get_random_nodes(k=test_size, alpha=random_node_alpha)
         ]
         total_evolutions = 0
         for evolution, probability in distributions.items():
