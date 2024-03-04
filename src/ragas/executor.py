@@ -4,7 +4,6 @@ import sys
 
 import asyncio
 import logging
-import threading
 import typing as t
 from dataclasses import dataclass, field
 
@@ -16,14 +15,6 @@ from ragas.run_config import RunConfig
 
 logger = logging.getLogger(__name__)
 
-
-def runner_exception_hook(args: threading.ExceptHookArgs):
-    print(args)
-    raise args.exc_type
-
-
-# set a custom exception hook
-# threading.excepthook = runner_exception_hook
 
 def as_completed(loop, coros, max_workers):
     loop_arg_dict = {"loop": loop} if sys.version_info[:2] < (3, 10) else {}
@@ -60,17 +51,14 @@ class Executor:
         self.jobs.append((callable_with_index, args, kwargs, name))
 
     def results(self) -> t.List[t.Any]:
-        loop = asyncio.new_event_loop()
+        loop = asyncio.get_event_loop()
         
-        try:
-            futures = as_completed(
-                loop=loop,
-                coros=[afunc(*args, **kwargs) for afunc, args, kwargs, _ in self.jobs],
-                max_workers=self.run_config.max_workers
-            )
-            results = loop.run_until_complete(self._aresults(futures))
-        finally:
-            loop.stop()
+        futures = as_completed(
+            loop=loop,
+            coros=[afunc(*args, **kwargs) for afunc, args, kwargs, _ in self.jobs],
+            max_workers=self.run_config.max_workers
+        )
+        results = loop.run_until_complete(self._aresults(futures))
 
         if results is None:
             if self.raise_exceptions:
